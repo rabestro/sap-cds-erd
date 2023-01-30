@@ -1,16 +1,16 @@
 BEGIN {
     FS = "[,: {()]+"
-    EndOfEntity = "}\n";
+    EndOfEntity = "};?\n";
     EndOfAttribute = ";\n";
 
     print "erDiagram";
 }
 # Clean up
 {gsub(/^\s+/, "")}
-/^(\/\/|@)/ {next}
+/^@/ {next}
 
 /^entity / {
-    RS = EndOfAttribute "|" EndOfEntity
+    RS = EndOfEntity "|" EndOfAttribute
     delete Associations
     EntityName = $2
     print ""
@@ -21,13 +21,18 @@ RT == EndOfAttribute {
     processRecord()
 }
 
-RT == EndOfEntity {
+isEntityEnd() {
     processRecord()
     processEntity()
 }
 
+function isEntityEnd() {
+    return substr(RT, 1, 1)  == "}"
+}
+
 function processRecord() {
-    gsub("\n", "");
+    gsub("(//[^\n]*)?\n *", " ")
+
     if (NF < 2) return
 
     if ($2 == "Association") {
@@ -37,12 +42,17 @@ function processRecord() {
     }
 }
 
-function printAttribute(   key,attribute,typeIndex) {
+function printAttribute(   key,attrIndex) {
     key = $1 == "key" ? "PK" : ""
-    attribute = key ? $2 : $1
-    typeIndex = key ? 3 : 2
+    attrIndex = key || !$1 ? 2 : 1
+    print "       ", getType(attrIndex), $attrIndex, key
+}
+
+function getType(attrIndex,   typeIndex) {
+    typeIndex = attrIndex + 1
     typeIndex += $typeIndex == "localized" ? 1 : 0
-    print "       ", tolower($typeIndex), attribute, key
+    chopPrefix(typeIndex)
+    return tolower($typeIndex)
 }
 
 function processEntity(   relation) {
@@ -53,10 +63,15 @@ function processEntity(   relation) {
     }
 }
 
-function saveAssociation(   relation,target) {
-    target = $NF
-    sub(/.+\./, "", target)
+function saveAssociation(   relation,cardinality,target) {
+    cardinality = NF == 4 ? "one" : $4
+    target = NF == 4 ? 4 : 5
+    chopPrefix(target)
 
-    relation = "||--||"
-    Associations[$1] = EntityName" "relation" "target" : "$1
+    relation = "||--" (cardinality == "one" ? "||" : "|{")
+    Associations[$1] = EntityName" "relation" "$target" : "$1
+}
+
+function chopPrefix(target) {
+    sub(/.+\./, "", $target)
 }
