@@ -1,17 +1,19 @@
 BEGIN {
     FS = "[,: {()]+"
     print "erDiagram";
+    EndOfEntity = "\}\n";
+    EndOfProperty = "\;\n";
 }
 # Clean up
 {gsub(/^\s+/, "")}
 /^(\/\/|@)/ {next}
 
-# New entity
 /^entity / {
     print "   ", toupper($2), "{"
-    RS = ";|}\n"
+    RS = EndOfProperty "|" EndOfEntity
 }
-RT == ";" {
+
+RT == EndOfProperty {
     gsub("\n", "");
     if ($2 == "Association") {
         print "       ", $1, "--->", $4, $5
@@ -19,7 +21,8 @@ RT == ";" {
     }
     print "       ", $1
 }
-RT == "}\n" {
+
+RT == EndOfEntity {
     RS = "\n"
     print "    }"
 }
