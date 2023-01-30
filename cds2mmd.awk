@@ -1,8 +1,8 @@
 BEGIN {
     FS = "[,: {()]+"
     print "erDiagram";
-    EndOfEntity = "\}\n";
-    EndOfProperty = "\;\n";
+    EndOfEntity = "}\n";
+    EndOfProperty = ";\n";
 }
 # Clean up
 {gsub(/^\s+/, "")}
