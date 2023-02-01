@@ -1,0 +1,51 @@
+erDiagram
+    %% db/books.cds
+    Books {
+        string title
+        string descr
+        integer stock
+        decimal price
+        currency currency
+        decimal rating
+        technicalbooleanflag isReviewable
+    }
+    Books }|--|| Authors : ""
+    Books ||--|{ Reviews : reviews
+    Books ||--|| Genres : genre
+    Authors {
+        date dateOfBirth
+        date dateOfDeath
+        string placeOfBirth
+        string placeOfDeath
+    }
+    Genres {
+        integer ID PK
+        composition children
+    }
+    Genres ||--|| Genres : parent
+    Genres ||--o{ Genres : children
+    %% db/common.cds
+    %% db/index.cds
+    %% db/notes.cds
+    Notes {
+        string note
+    }
+    %% db/orders.cds
+    Orders {
+        string OrderNo
+        user buyer
+        decimal total
+        currency currency
+    }
+    OrderItems {
+        integer quantity
+        decimal amount
+    }
+    OrderItems ||--|| Books : book
+    OrderItems ||--|| Orders : parent
+    %% db/reviews.cds
+    Reviews {
+        rating rating
+        string title
+        string text
+    }
