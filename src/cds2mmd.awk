@@ -1,20 +1,25 @@
 BEGIN {
     FS = "[,: {()]+"
-    EndOfEntity = "};?\n";
-    EndOfAttribute = ";\n";
+    EndOfEntity = "};?\n"
+    EndOfAttribute = ";\n"
 
-    print "erDiagram";
+    print "erDiagram"
 }
+
+BEGINFILE {
+#    print "    %%", FILENAME
+}
+
 # Clean up
 {gsub(/^\s+/, "")}
 /^@/ {next}
 
-/^entity / {
-    RS = EndOfEntity "|" EndOfAttribute
-    delete Associations
-    EntityName = $2
-    print ""
-    print "   ", EntityName, "{"
+/\<entity\>/ {
+    processEntityStart()
+}
+
+association() {
+    saveAssociation()
 }
 
 RT == EndOfAttribute {
@@ -23,11 +28,29 @@ RT == EndOfAttribute {
 
 isEntityEnd() {
     processRecord()
-    processEntity()
+
+    print "    }\n"
+    RS = "\n"
+}
+
+END {
+    for (relation in Associations) {
+        print "   ", Associations[relation]
+    }
+}
+
+function processEntityStart() {
+    EntityName = $2
+    print "   ", EntityName, "{"
+    RS = EndOfEntity "|" EndOfAttribute
 }
 
 function isEntityEnd() {
     return substr(RT, 1, 1)  == "}"
+}
+
+function association() {
+    return RT == EndOfAttribute && $2 == "Association"
 }
 
 function processRecord() {
@@ -56,7 +79,6 @@ function getType(attrIndex,   typeIndex) {
 }
 
 function processEntity(   relation) {
-    RS = "\n"
     print "    }"
     for (relation in Associations) {
         print "   ", Associations[relation]
@@ -64,11 +86,16 @@ function processEntity(   relation) {
 }
 
 function saveAssociation(   relation,cardinality,target) {
-    cardinality = NF == 4 ? "one" : $4
-    target = NF == 4 ? 4 : 5
+    if ($4 ~ "one|many") {
+        cardinality = $4
+        target = 5
+    } else {
+        cardinality = "one"
+        target = 4
+    }
     chopPrefix(target)
 
-    relation = "||--" (cardinality == "one" ? "||" : "|{")
+    relation = "||--" (cardinality == "one" ? "|o" : "o{")
     Associations[$1] = EntityName" "relation" "$target" : "$1
 }
 
