@@ -1,38 +1,44 @@
 BEGIN {
+    FS = "[,: {()]+"
     print "erDiagram"
 }
+/^\s*(@|on )/{next}
 /\<entity\>/, /};?$/ {
-    gsub(/^\s+|\/\/.*$|localized|\([^)]+\)|;/, "")
+    gsub(/^\s+|\/\/.*$|localized|\([^)]+\)|;|\<[[:alpha:]]{1,4}\.|@[[:alpha:]]+;?/, "")
     if ($1 == "entity") {print "   ", EntityName = $2, "{"; next}
-    if ($3 == "Association") saveAssociation()
-    if ($1 == "}") {print "    }\n"; next}
-    if ($1 ~ /^@/) next
-    if ($1 == "key" || $2 == ":") printAttribute()
+    if ($2 ~ "Association|Composition") saveAssociation()
+    if ($1 == "key") printRecord($3, $2, "PK")
+    if (NF > 1) printRecord($2, $1)
+    if ($1 == "}") print "    }\n"
 }
 END {
-    for (relation in Associations) print "   ", Associations[relation]
-}
-
-function printAttribute(   key) {
-    if ($1 == "key") {key = "PK"; gsub(/key/, "")}
-    chopPrefix($3); print "       ", $3, $1, key
-}
-
-function saveAssociation(   relation,cardinality,target) {
-    if ($5 ~ "one|many") {
-        cardinality = $5
-        target = 6
-    } else {
-        cardinality = "one"
-        target = 5
+    for (sourceEntity in Associations) {
+        for (targetEntity in Associations[sourceEntity]) {
+            left = Associations[sourceEntity][targetEntity][1]
+            right = Associations[sourceEntity][targetEntity][2]
+            relation = (left?left:"|o")"--"(right?right:"o|")
+            print "   ", sourceEntity, relation, targetEntity, ":\"\""
+        }
     }
-    chopPrefix(target)
+}
 
-    relation = "||--" (cardinality == "one" ? "o|" : "o{")
-    Associations[$1] = EntityName" "relation" "$target" : "$1
+function printRecord(type, attribute, key) {
+    print "       ", type, attribute, key;
     next
 }
 
-function chopPrefix(target) {
-    sub(/.+\./, "", $target)
+function saveAssociation(   cardinality,targetEntity) {
+    if ($4 ~ "one|many") {
+        cardinality = $4
+        targetEntity = $5
+    } else {
+        cardinality = "one"
+        targetEntity = $4
+    }
+    if (targetEntity in Associations && EntityName in Associations[targetEntity]) {
+        Associations[targetEntity][EntityName][1] = cardinality == "one" ? "|o" : "}o"
+    } else {
+        Associations[EntityName][targetEntity][2] = cardinality == "one" ? "o|" : "o{"
+    }
+    next
 }

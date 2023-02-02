@@ -1,51 +1,51 @@
 erDiagram
-    %% db/books.cds
     Books {
-        string title
-        string descr
-        integer stock
-        decimal price
-        currency currency
-        decimal rating
-        technicalbooleanflag isReviewable
+        String title 
+        String descr 
+        Integer stock 
+        Decimal price 
+        Currency currency 
+        Decimal rating 
+        TechnicalBooleanFlag isReviewable 
     }
-    Books }|--|| Authors : ""
-    Books ||--|{ Reviews : reviews
-    Books ||--|| Genres : genre
+
     Authors {
-        date dateOfBirth
-        date dateOfDeath
-        string placeOfBirth
-        string placeOfDeath
+        String name 
+        Date dateOfBirth 
+        Date dateOfDeath 
+        String placeOfBirth 
+        String placeOfDeath 
     }
+
     Genres {
-        integer ID PK
-        composition children
+        Integer ID PK
     }
-    Genres ||--|| Genres : parent
-    Genres ||--o{ Genres : children
-    %% db/common.cds
-    %% db/index.cds
-    %% db/notes.cds
+
     Notes {
-        string note
+        String note 
     }
-    %% db/orders.cds
+
     Orders {
-        string OrderNo
-        user buyer
-        decimal total
-        currency currency
+        String OrderNo 
+        User buyer 
+        Decimal total 
+        Currency currency 
     }
+
     OrderItems {
-        integer quantity
-        decimal amount
+        Integer quantity 
+        Decimal amount 
     }
-    OrderItems ||--|| Books : book
-    OrderItems ||--|| Orders : parent
-    %% db/reviews.cds
+
     Reviews {
-        rating rating
-        string title
-        string text
+        Rating rating 
+        String title 
+        String text 
     }
+
+    Orders |o--o{ OrderItems :""
+    OrderItems |o--o| Books :""
+    Genres }o--o| Genres :""
+    Books |o--o{ Reviews :""
+    Books |o--o| Genres :""
+    Books }o--o| Authors :""
