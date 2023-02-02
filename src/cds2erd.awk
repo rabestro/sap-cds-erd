@@ -5,10 +5,10 @@ BEGIN {
 /^\s*(@|on )/{next}
 /\<entity\>/, /};?$/ {
     gsub(/^\s+|\/\/.*$|localized|\([^)]+\)|;|\<[[:alpha:]]{1,4}\.|@[[:alpha:]]+;?/, "")
-    if ($1 == "entity") {print "   ", EntityName = $2, "{"; next}
+    if ($1 == "entity") printEntity()
     if ($2 ~ "Association|Composition") saveAssociation()
-    if ($1 == "key") printRecord($3, $2, "PK")
-    if (NF > 1) printRecord($2, $1)
+    if ($1 == "key") {printRecord($3, $2, "PK"); next}
+    if (NF > 1) {printRecord($2, $1); next}
     if ($1 == "}") print "    }\n"
 }
 END {
@@ -22,9 +22,17 @@ END {
     }
 }
 
-function printRecord(type, attribute, key) {
-    print "       ", type, attribute, key;
+function printEntity() {
+    print "   ", EntityName = $2, "{"
+    if ($0 ~ /CodeList/) {
+        printRecord("String", "name")
+        printRecord("String", "descr")
+    }
     next
+}
+
+function printRecord(type, attribute, key) {
+    print "       ", type, attribute, key
 }
 
 function saveAssociation(   cardinality,targetEntity) {
