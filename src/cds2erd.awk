@@ -2,6 +2,7 @@ BEGIN {
     FS = "[,: {()]+"
     print "erDiagram"
 }
+/^\s*\/\*/, /.*\*\// {next} # skip multiline comments
 /^\s*(@|on |and )/{next}
 /\<entity\>/, /};?$/ {
     gsub(/^\s+|\/\/.*$|localized|\([^)]+\)|;|\<[[:alpha:]]{1,4}\.|@[[:alpha:]]+;?/, "")
