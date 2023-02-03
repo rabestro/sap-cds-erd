@@ -2,7 +2,7 @@ BEGIN {
     FS = "[,: {()]+"
     print "erDiagram"
 }
-/^\s*(@|on )/{next}
+/^\s*(@|on |and )/{next}
 /\<entity\>/, /};?$/ {
     gsub(/^\s+|\/\/.*$|localized|\([^)]+\)|;|\<[[:alpha:]]{1,4}\.|@[[:alpha:]]+;?/, "")
     if ($1 == "entity") printEntity()
@@ -17,7 +17,7 @@ END {
             left = Associations[sourceEntity][targetEntity][1]
             right = Associations[sourceEntity][targetEntity][2]
             relation = (left?left:"|o")"--"(right?right:"o|")
-            print "   ", sourceEntity, relation, targetEntity, ":\"\""
+            print "   ", sourceEntity, relation, targetEntity, ": \"\""
         }
     }
 }
@@ -35,7 +35,7 @@ function printRecord(type, attribute, key) {
     print "       ", type, attribute, key
 }
 
-function saveAssociation(   cardinality,targetEntity) {
+function saveAssociation(   cardinality,targetEntity,mandatory) {
     if ($4 ~ "one|many") {
         cardinality = $4
         targetEntity = $5
@@ -43,10 +43,12 @@ function saveAssociation(   cardinality,targetEntity) {
         cardinality = "one"
         targetEntity = $4
     }
+    mandatory = $0 ~ /not null|@mandatory/ ? "|" : "o"
+
     if (targetEntity in Associations && EntityName in Associations[targetEntity]) {
-        Associations[targetEntity][EntityName][1] = cardinality == "one" ? "|o" : "}o"
+        Associations[targetEntity][EntityName][1] = (cardinality == "one" ? "|" : "}") mandatory
     } else {
-        Associations[EntityName][targetEntity][2] = cardinality == "one" ? "o|" : "o{"
+        Associations[EntityName][targetEntity][2] = mandatory (cardinality == "one" ? "|" : "{")
     }
     next
 }
