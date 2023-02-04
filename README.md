@@ -8,7 +8,7 @@ The small AWK script generate mermaid Entity Relationship diagrams from SAP Clou
 gawk -f src/cds2erd.awk db/* > bookstore.mermaid
 ```
 
-## Sample ER diagram
+## Sample generated ER diagram
 ```mermaid
 erDiagram
     Books {
