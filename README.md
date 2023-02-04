@@ -1,4 +1,4 @@
-# SAP CDS Entity Relationships diagram 
+# SAP CDS Entity Relationship Diagrams
 
 The small AWK script generate mermaid diagram from CDS files. 
 
