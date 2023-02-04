@@ -1,16 +1,24 @@
+#!/usr/bin/gawk --exec
+#
+# Copyright (c) 2023 Jegors Čemisovs
+# License: Apache-2.0 license
+# Repository: https://github.com/rabestro/sap-cds-erd-mermaid
+#
+# Creates ERDs for SAP Cloud Application Programming Model
+#
 BEGIN {
     FS = "[,: {()]+"
     print "erDiagram"
 }
-/^\s*\/\*/, /.*\*\// {next} # skip multiline comments
-/^\s*(@|on |and )/{next}
+/^\s*\/\*/, /.*\*\// {next}     # skips multiline comments
+/^\s*(@|on |and )/ {next}
 /\<entity\>/, /};?$/ {
     gsub(/^\s+|\/\/.*$|localized|\([^)]+\)|;|\<[[:alpha:]]{1,4}\.|@[[:alpha:]]+;?/, "")
     if ($1 == "entity") printEntity()
-    if ($2 ~ "Association|Composition") saveAssociation()
-    if ($1 == "key") {printRecord($3, $2, "PK"); next}
-    if (NF > 1) {printRecord($2, $1); next}
-    if ($1 == "}") print "    }\n"
+    else if ($2 ~ "Association|Composition") saveAssociation()
+    else if ($1 == "key") printRecord($3, $2, "PK")
+    else if (NF > 1) printRecord($2, $1)
+    else if ($1 == "}") print "    }\n"
 }
 END {
     for (sourceEntity in Associations) {
@@ -29,7 +37,6 @@ function printEntity() {
         printRecord("String", "name")
         printRecord("String", "descr")
     }
-    next
 }
 
 function printRecord(type, attribute, key) {
@@ -51,5 +58,4 @@ function saveAssociation(   cardinality,targetEntity,mandatory) {
     } else {
         Associations[EntityName][targetEntity][2] = mandatory (cardinality == "one" ? "|" : "{")
     }
-    next
 }
