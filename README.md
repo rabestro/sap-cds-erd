@@ -1,6 +1,6 @@
 # SAP CDS Entity Relationship Diagrams
 
-The small AWK script generate mermaid Entity Relationship diagrams from SAP Cloud Application Programming Model files.
+The small AWK script generate [mermaid](https://mermaid.js.org/) Entity Relationship diagrams from SAP Cloud Application Programming Model files.
 
 ## How to run
 
