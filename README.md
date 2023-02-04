@@ -2,7 +2,7 @@
 
 The small AWK script generate [mermaid](https://mermaid.js.org/) Entity Relationship diagrams from SAP Cloud Application Programming Model files.
 
-## How to run
+## How to run script
 
 ```shell
 gawk -f src/cds2erd.awk db/* > bookstore.mermaid
