@@ -9,6 +9,8 @@ gawk -f src/cds2erd.awk db/* > bookstore.mermaid
 ```
 
 ## Sample generated ER diagram
+
+Below is the database schema from the project SAP Cloud CAP Samples [Bookstore](https://github.com/SAP-samples/cloud-cap-samples/) 
 ```mermaid
 erDiagram
     Books {
