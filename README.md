@@ -8,6 +8,16 @@ The small AWK script generate [mermaid](https://mermaid.js.org/) Entity Relation
 gawk -f src/cds2erd.awk db/* > bookstore.mermaid
 ```
 
+Alternatively you can make the script executable:
+```shell
+chmod +x cds2erd.awk
+```
+In this case you can call the script without specifying an interpreter:
+
+```shell
+cds2erd.awk schema.cds > schema.mermaid
+```
+
 ## Sample generated ER diagram
 
 Below is the database schema from the project SAP Cloud CAP Samples [Bookstore](https://github.com/SAP-samples/cloud-cap-samples/) 
