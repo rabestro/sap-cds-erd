@@ -8,10 +8,12 @@ The small AWK script generate [mermaid](https://mermaid.js.org/) Entity Relation
 gawk -f src/cds2erd.awk db/* > bookstore.mermaid
 ```
 
-Alternatively you can make the script executable:
+Alternatively, you can move the script to the bin directory and make it executable:
+
 ```shell
 chmod +x cds2erd.awk
 ```
+
 In this case you can call the script without specifying an interpreter:
 
 ```shell
