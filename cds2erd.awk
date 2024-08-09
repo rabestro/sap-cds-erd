@@ -11,9 +11,9 @@ BEGIN {
     print "erDiagram"
 }
 /^\s*\/\*/, /.*\*\// {next}     # skips multiline comments
-/^\s*(@|on |and )/ {next}
+/^\s*(@|on |and )/ {next}       # skip annotations and joins
 /\<entity\>/, /};?$/ {
-    gsub(/^\s+|\/\/.*$|localized|\([^)]+\)|;|\<[[:alpha:]]{1,4}\.|@[[:alpha:]]+;?/, "")
+    cleanUp()
     if ($1 == "entity") printEntity()
     else if ($2 ~ "Association|Composition") saveAssociation()
     else if ($1 == "key") printRecord($3, $2, "PK")
@@ -58,4 +58,8 @@ function saveAssociation(   cardinality,targetEntity,mandatory) {
     } else {
         Associations[EntityName][targetEntity][2] = mandatory (cardinality == "one" ? "|" : "{")
     }
+}
+
+function cleanUp() {
+    gsub(/^\s+|\/\/.*$|localized|\([^)]+\)|;|\<[[:alpha:]]{1,4}\.|@[[:alpha:]]+;?/, "")
 }
