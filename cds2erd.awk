@@ -30,7 +30,6 @@ END {
         }
     }
 }
-
 function printEntity() {
     print "   ", EntityName = $2, "{"
     if ($0 ~ /CodeList/) {
@@ -38,11 +37,9 @@ function printEntity() {
         printRecord("String", "descr")
     }
 }
-
 function printRecord(type, attribute, key) {
     print "       ", type, attribute, key
 }
-
 function saveAssociation(   cardinality,targetEntity,mandatory) {
     if ($4 ~ "one|many") {
         cardinality = $4
@@ -59,7 +56,6 @@ function saveAssociation(   cardinality,targetEntity,mandatory) {
         Associations[EntityName][targetEntity][2] = mandatory (cardinality == "one" ? "|" : "{")
     }
 }
-
 function cleanUp() {
     gsub(/^\s+|\/\/.*$|localized|\([^)]+\)|;|\<[[:alpha:]]{1,4}\.|@[[:alpha:]]+;?/, "")
 }
